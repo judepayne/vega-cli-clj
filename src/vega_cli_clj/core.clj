@@ -10,11 +10,37 @@
     :vega      (= 0 (:exit (shell/sh "vg2svg" "--help")))))
 
 
+(def ^{:private true} cli-installed? (memoize vega-cli-installed?))
+
+
 (defn- bytes->file
   "Writes a byte array to file, f."
   [f ba]
   (with-open [out (io/output-stream (io/file f))]
     (.write out ba)))
+
+
+(def test-dat
+  {:vega-doc
+   {:data
+    {:values
+     [{:a "A", :b 28}
+      {:a "B", :b 55}
+      {:a "C", :b 43}
+      {:a "D", :b 91}
+      {:a "E", :b 81}
+      {:a "F", :b 53}
+      {:a "G", :b 19}
+      {:a "H", :b 87}
+      {:a "I", :b 52}]},
+    :mark "bar",
+    :encoding
+    {:x {:field "a", :type "ordinal", :axis {:labelAngle 0}},
+     :y {:field "b", :type "quantitative"}}},
+   :mode :vega-lite,
+   :fmt :png,
+   :output-filename "out.png"
+   })
 
 
 (defn vega-cli
@@ -25,7 +51,7 @@
      :or {fmt :svg mode :vega-lite}}]
    {:pre [(#{:vega-lite :vega} mode)
           (#{:png :pdf :svg :vega} fmt)]}
-   (if (vega-cli-installed? mode)
+   (if (cli-installed? mode)
      (let [short-mode (case (keyword mode) :vega-lite "vl" :vega "vg")
            ext (name (if (= fmt :vega) :vg fmt))
            command (str short-mode 2 ext)
@@ -42,4 +68,6 @@
            out)
          (throw (RuntimeException. err))))
      (throw (RuntimeException.
-             "Vega CLI not installed! Please run `npm install -g vega vega-lite vega-cli`.")))))
+             (str "Vega CLI not installed! Please run `npm install -g vega vega-lite vega-cli`. "
+                  "If you have an error: `TypeError: Cannot read proprerty 'getContext' of null`, "
+                  "then run `npm install -g canvas`."))))))

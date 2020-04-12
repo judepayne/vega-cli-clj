@@ -33,6 +33,15 @@ When `:pdf` or `:png` is specified for the `:fmt` key, a byte array is returned.
 
 When `output-filename` is added to the map of arguments, the output is written to that file.
 
+**Before running** vega-cli-clj, you run to have the vega command line tools properly installed.
+*In each directory* where you'll be running this code, you need to run:
+
+    npm install -g vega vega-lite vega-cli
+    
+and
+
+    npm install -g canvas
+
 
 ### License 
 
